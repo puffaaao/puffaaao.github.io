@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taehyun Kim - LLM Researcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=Spectral:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBFBFC;
+  --surface:#F2F3F5;
+  --ink:#101316;
+  --ink-2:#3E444B;
+  --ink-3:#767C85;
+  --rule:#E1E3E7;
+  --accent:#3D4E7A;
+  --accent-soft:rgba(61,78,122,.06);
+  --maxw:1120px;
+
+  /* --- swap these two lines to change the whole page's typography --- */
+  --font-display:'Spectral', Georgia, serif;
+  --font-body:'Inter', system-ui, sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+
+a{color:inherit;text-decoration:none;}
+
+::selection{background:var(--accent);color:#fff;}
+
+section[id]{scroll-margin-top:72px;}
+
+/* ---------- scroll progress ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:2px;width:0%;
+  background:var(--accent);z-index:100;
+  transition:width .1s linear;
+}
+
+/* ---------- shared type ---------- */
+.label{
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--ink-3);
+}
+
+.serif{font-family:var(--font-display);font-weight:400;}
+
+/* ---------- header ---------- */
+header{
+  position:sticky;top:0;z-index:50;
+  background:rgba(251,251,252,.86);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--rule);
+}
+.header-inner{
+  max-width:var(--maxw);margin:0 auto;
+  padding:16px 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:18px;
+}
+.mark{
+  font-family:var(--font-display);font-size:17px;letter-spacing:-.01em;
+  flex:0 0 auto;white-space:nowrap;
+}
+nav{
+  display:flex;gap:26px;
+  min-width:0;
+  overflow-x:auto;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+nav::-webkit-scrollbar{display:none;}
+nav a{
+  font-size:12px;font-weight:450;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-2);
+  position:relative;padding-bottom:2px;
+  white-space:nowrap;flex:0 0 auto;
+}
+nav a::after{
+  content:"";position:absolute;left:0;bottom:0;
+  width:100%;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+nav a:hover::after{transform:scaleX(1);}
+nav a:hover{color:var(--ink);}
+nav a.active{color:var(--ink);}
+nav a.active::after{transform:scaleX(1);}
+
+/* ---------- layout ---------- */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 40px;}
+
+.block{
+  display:grid;
+  grid-template-columns:180px 1fr;
+  gap:56px;
+  padding:88px 0;
+  border-top:1px solid var(--rule);
+}
+.block > .side{position:sticky;top:96px;align-self:start;}
+.block > .side .label{
+  display:inline-block;position:relative;
+  transition:color .35s ease;
+}
+.block > .side .label::before{
+  content:"";position:absolute;left:-14px;top:50%;
+  width:6px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;
+  transition:transform .4s cubic-bezier(.2,.6,.2,1);
+}
+.block.current > .side .label{color:var(--ink);}
+.block.current > .side .label::before{transform:scaleX(1);}
+.block > .body{max-width:760px;}
+
+/* ---------- hero ---------- */
+.hero{padding:120px 0 96px;}
+.hero .eyebrow{
+  margin-bottom:26px;
+  display:flex;align-items:center;gap:12px;
+}
+.hero .eyebrow::before{
+  content:"";width:34px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:left;
+}
+.hero .eyebrow.in::before{
+  transform:scaleX(1);
+  transition:transform .9s cubic-bezier(.2,.6,.2,1) .25s;
+}
+.hero h1{
+  font-family:var(--font-display);
+  font-weight:300;
+  font-size:clamp(42px,6.2vw,72px);
+  line-height:1.06;
+  letter-spacing:-.02em;
+  max-width:16ch;
+}
+.hero h1 em{font-style:italic;color:var(--accent);}
+.hero .role{
+  margin-top:22px;
+  font-size:15px;font-weight:500;
+  color:var(--ink-2);
+}
+.hero .role .hl{ color:#B4342F; }
+.hero .intro{
+  margin-top:26px;
+  max-width:56ch;
+  color:var(--ink-2);
+  font-size:16.5px;
+}
+.hero .facts{
+  margin-top:38px;
+  display:flex;flex-wrap:wrap;gap:0;
+  border-top:1px solid var(--rule);
+}
+.hero .facts div{
+  padding:16px 28px 0 0;
+  margin-right:28px;
+  border-right:1px solid var(--rule);
+  padding-right:28px;
+}
+.hero .facts div:last-child{border-right:none;}
+.hero .facts strong{display:block;font-size:14px;font-weight:500;margin-top:4px;}
+
+/* ---------- prose ---------- */
+h2{
+  font-family:var(--font-display);
+  font-weight:400;
+  font-size:26px;
+  letter-spacing:-.01em;
+  margin-bottom:18px;
+}
+p + p{margin-top:14px;}
+.body p{color:var(--ink-2);}
+
+/* ---------- portrait ---------- */
+.about-split{
+  display:grid;
+  grid-template-columns:1fr 232px;
+  gap:44px;
+  align-items:start;
+  margin-top:6px;
+}
+.portrait-slot{position:sticky;top:110px;}
+.portrait{
+  display:block;width:100%;
+  aspect-ratio:4/5;object-fit:cover;
+  border:1px solid var(--rule);
+  background:var(--surface);
+  filter:grayscale(1);
+  transition:filter .5s ease;
+}
+.portrait:hover{filter:grayscale(0);}
+.portrait-cap{
+  margin-top:9px;
+  font-size:12px;color:var(--ink-3);
+  display:flex;justify-content:space-between;gap:12px;
+}
+
+/* ---------- chips ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:26px;}
+.chips span{
+  font-size:12.5px;color:var(--ink-2);
+  border:1px solid var(--rule);
+  background:var(--surface);
+  padding:5px 11px;border-radius:3px;
+  transition:border-color .3s ease,color .3s ease;
+}
+.chips span:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ---------- entry list ---------- */
+.entry{
+  padding:26px 20px 26px 0;
+  border-top:1px solid var(--rule);
+  margin-left:-16px;padding-left:16px;
+  box-shadow:inset 2px 0 0 transparent;
+  transition:box-shadow .35s ease,background-color .35s ease;
+}
+.entry:hover{
+  box-shadow:inset 2px 0 0 var(--accent);
+  background-color:var(--accent-soft);
+}
+.entry:first-child{border-top:none;padding-top:0;}
+.entry h3{
+  font-family:var(--font-display);
+  font-weight:400;font-size:19px;
+  margin-bottom:6px;
+}
+.entry .meta{
+  font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:10px;
+}
+.entry p{font-size:15.5px;color:var(--ink-2);max-width:62ch;}
+.entry ul{margin-top:8px;padding-left:17px;}
+.entry li{font-size:15.5px;color:var(--ink-2);margin-bottom:3px;}
+
+.state{
+  display:inline-block;margin-top:12px;
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);
+  border:1px solid var(--accent);
+  border-radius:2px;padding:2px 8px;
+}
+
+/* ---------- publications ---------- */
+.pub{
+  display:grid;grid-template-columns:90px 1fr;gap:24px;
+  padding:20px 20px 20px 16px;margin-left:-16px;
+  border-top:1px solid var(--rule);
+  box-shadow:inset 2px 0 0 transparent;
+  transition:box-shadow .35s ease,background-color .35s ease;
+}
+.pub:hover{
+  box-shadow:inset 2px 0 0 var(--accent);
+  background-color:var(--accent-soft);
+}
+.pub:first-child{border-top:none;padding-top:0;}
+.pub .yr{font-size:13px;color:var(--ink-3);padding-top:3px;}
+.pub h3{font-family:var(--font-display);font-weight:400;font-size:17.5px;line-height:1.45;}
+.pub .venue{font-size:13px;color:var(--ink-3);margin-top:4px;}
+
+/* ---------- contact ---------- */
+.contact-links{display:flex;flex-wrap:wrap;gap:26px;margin-top:24px;}
+.contact-links a{
+  font-size:14px;font-weight:500;
+  border-bottom:1px solid var(--rule);
+  padding-bottom:3px;
+  transition:border-color .25s ease,color .25s ease;
+}
+.contact-links a:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ---------- footer ---------- */
+footer{
+  border-top:1px solid var(--rule);
+  padding:26px 0 44px;
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+}
+
+/* ---------- motion ---------- */
+.rise{opacity:0;transform:translateY(16px);}
+.rise.in{
+  opacity:1;transform:none;
+  transition:opacity .7s cubic-bezier(.2,.6,.2,1),transform .7s cubic-bezier(.2,.6,.2,1);
+}
+.rise.s1{transition-delay:.06s;}
+.rise.s2{transition-delay:.12s;}
+.rise.s3{transition-delay:.18s;}
+.rise.s4{transition-delay:.24s;}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  .rise{opacity:1;transform:none;}
+  *{transition:none!important;animation:none!important;}
+}
+
+/* ---------- responsive ---------- */
+@media (max-width:860px){
+  .wrap,.header-inner{padding-left:24px;padding-right:24px;}
+  .block{grid-template-columns:1fr;gap:20px;padding:64px 0;}
+  .block > .side{position:static;}
+  nav{gap:16px;}
+  nav a{font-size:11px;}
+  .pub{grid-template-columns:1fr;gap:6px;}
+  .hero{padding:80px 0 64px;}
+  .hero .facts div{border-right:none;padding-right:0;margin-right:0;width:100%;}
+  .about-split{grid-template-columns:1fr;gap:30px;}
+  .portrait-slot{position:static;max-width:260px;}
+}
+
+@media (max-width:560px){
+  .wrap,.header-inner{padding-left:18px;padding-right:18px;}
+  .header-inner{padding-top:13px;padding-bottom:13px;gap:14px;}
+  .mark{font-size:15px;}
+  nav{gap:14px;}
+  nav a{font-size:10px;letter-spacing:.06em;}
+}
+
+a:focus-visible,nav a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px;}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<header>
+  <div class="header-inner">
+    <div class="mark">Taehyun Kim</div>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#research">Research</a>
+      <a href="#experience">Experience</a>
+      <a href="#publications">Publications</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="label eyebrow rise">AI / ML / NLP /LLM </div>
+    <h1 class="serif rise s1">Hi, my name is <em>Taehyun Kim.</em></h1>
+    <div class="role rise s2">UnderGraduate Researcher @ <span class="hl">LILAB, Korea University.</span></div>
+    <p class="intro rise s3">
+      I work on the behavioral side of large language models — the failure modes, the tone shifts,
+      the moments where output diverges from what the setup predicts.
+    </p>
+    <div class="facts rise s4">
+      <div><span class="label">Focus</span><strong>LLM behavior &amp; evaluation</strong></div>
+      <div><span class="label">Methods</span><strong>ibibbib</strong></div>
+      <div><span class="label">Based in</span><strong>Seoul, Korea</strong></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="block" id="about">
+    <div class="side"><div class="label">About</div></div>
+    <div class="body">
+      <h2 class="rise">Background</h2>
+      <div class="about-split">
+        <div>
+          <p class="rise s1">
+            I'm an undergraduate researcher at LILAB, Korea University, working toward publication at
+            ACL, EMNLP, NeurIPS, and AAAI. Before my current direction I worked on synthetic data
+            pipelines and vision-LLM fine-tuning, which is where [ICSE Paper Title] came from.
+          </p>
+          <p class="rise s1">
+            Most of my research starts from an observation rather than a research question. I run small
+            pilots, look for results that don't match the expected pattern, and build the question
+            backwards from there. What I'm looking for in a topic is a real opening &mdash; something where
+            the observation itself is surprising, not just the mitigation.
+          </p>
+          <div class="chips rise s2">
+            <span>Python</span>
+            <span>PyTorch</span>
+            <span>Hugging Face</span>
+            <span>TransformerLens</span>
+            <span>Vision-LLM fine-tuning</span>
+            <span>Synthetic data pipelines</span>
+          </div>
+        </div>
+        <div class="portrait-slot rise s2">
+          <img class="portrait" src="profile.jpg" alt="Taehyun Kim">
+          <div class="portrait-cap">
+            <span>Taehyun Kim</span>
+            <span>Seoul, 20XX</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESEARCH -->
+  <section class="block" id="research">
+    <div class="side"><div class="label">Research</div></div>
+    <div class="body">
+      <h2 class="rise">Current work</h2>
+      <div style="margin-top:26px;">
+        <div class="entry rise">
+          <h3>[Project Title]</h3>
+          <div class="meta">[Model / dataset]</div>
+          <p>One or two sentences on what you're observing and why it's worth chasing.</p>
+          <span class="state">Pilot running</span>
+        </div>
+        <div class="entry rise">
+          <h3>[Project Title]</h3>
+          <div class="meta">[Model / dataset]</div>
+          <p>One or two sentences on what you're observing and why it's worth chasing.</p>
+          <span class="state">Exploratory</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section class="block" id="experience">
+    <div class="side"><div class="label">Experience</div></div>
+    <div class="body">
+      <h2 class="rise">Where I've worked</h2>
+      <div style="margin-top:26px;">
+        <div class="entry rise">
+          <h3>Undergraduate Researcher</h3>
+          <div class="meta">[Lab Name], [University] &middot; 20XX &ndash; Present</div>
+          <ul>
+            <li>Designing and running pilot experiments on LLM behavioral phenomena</li>
+            <li>[Add a concrete result or method here]</li>
+          </ul>
+        </div>
+        <div class="entry rise">
+          <h3>Undergraduate Researcher</h3>
+          <div class="meta">DPSLAB @ Sookmyung Women's University &middot; MAR 2024 &ndash; MAR 2025</div>
+          <ul>
+            <li>Built synthetic data pipelines for [purpose]</li>
+            <li>Fine-tuned vision-language models for [task]</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PUBLICATIONS -->
+  <section class="block" id="publications">
+    <div class="side"><div class="label">Publications</div></div>
+    <div class="body">
+      <h2 class="rise">Papers</h2>
+      <div style="margin-top:26px;">
+        <div class="pub rise">
+          <div class="yr">20XX</div>
+          <div>
+            <h3>[Paper Title]</h3>
+            <div class="venue">[Author list] &middot; ICSE 2025</div>
+          </div>
+        </div>
+        <div class="pub rise">
+          <div class="yr">In prep</div>
+          <div>
+            <h3>[Working Title]</h3>
+            <div class="venue">Target venue: [ACL / EMNLP]</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="block" id="contact">
+    <div class="side"><div class="label">Contact</div></div>
+    <div class="body">
+      <h2 class="rise">Get in touch</h2>
+      <p class="rise s1">
+        Open to collaboration, questions about any of the work above, or research discussion in general.
+      </p>
+      <div class="contact-links rise s2">
+        <a href="mailto:puffaaao@sookmyung.ac.kr">Email</a>
+        <a href="https://www.linkedin.com/in/taehyun-kim-8a3320339">LinkedIn</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span class="label">Taehyun Kim &mdash; Portfolio</span>
+    <span class="label">Last updated AUG 26'</span>
+  </footer>
+
+</main>
+
+<script>
+// scroll progress
+const bar = document.getElementById('progress');
+const onScroll = () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  bar.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+};
+window.addEventListener('scroll', onScroll, {passive:true});
+onScroll();
+
+// reveal on scroll
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const items = document.querySelectorAll('.rise');
+if (reduce) {
+  items.forEach(el => el.classList.add('in'));
+} else {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, {threshold:0.12, rootMargin:'0px 0px -8% 0px'});
+  items.forEach(el => io.observe(el));
+}
+
+// active section: highlight nav link + sticky side label
+const blocks = [...document.querySelectorAll('.block[id]')];
+const links = new Map(
+  [...document.querySelectorAll('nav a')].map(a => [a.getAttribute('href').slice(1), a])
+);
+const spy = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    e.target.classList.toggle('current', e.isIntersecting);
+    const a = links.get(e.target.id);
+    if (a) a.classList.toggle('active', e.isIntersecting);
+  });
+}, {rootMargin: '-45% 0px -45% 0px'});
+blocks.forEach(b => spy.observe(b));
+</script>
+
+</body>
+</html>
