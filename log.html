@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7f8f8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="기록">
+<meta name="robots" content="noindex, nofollow">
+<title>일일 기록</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #f7f8f8; }
+  body { padding: 24px 16px calc(24px + env(safe-area-inset-bottom)); }
+  @media (prefers-color-scheme: dark) {
+    html, body { background: #14191c; }
+  }
+</style>
+</head>
+<body>
+<div id="root">
+  <div class="wrap">
+    <header class="head">
+      <div class="eyebrow">일일 기록</div>
+      <h1>오늘 상태</h1>
+      <div class="today" id="todayLabel"></div>
+    </header>
+
+    <section class="card" id="entryCard">
+      <div class="field">
+        <label class="fl" for="wake">일어난 시각</label>
+        <input type="time" id="wake" class="timeinput">
+      </div>
+
+      <div class="field">
+        <div class="fl">식사</div>
+        <div class="segs" id="meals" role="group" aria-label="식사 횟수">
+          <button type="button" class="seg" data-v="0">0</button>
+          <button type="button" class="seg" data-v="1">1</button>
+          <button type="button" class="seg" data-v="2">2</button>
+          <button type="button" class="seg" data-v="3">3+</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="fl">밖에 나감</div>
+        <div class="segs" id="out" role="group" aria-label="외출 여부">
+          <button type="button" class="seg" data-v="no">아니오</button>
+          <button type="button" class="seg" data-v="yes">예</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="fl" for="note">한 줄 <span class="opt">선택</span></label>
+        <input type="text" id="note" class="textinput" maxlength="80" placeholder="적고 싶은 게 있으면">
+      </div>
+
+      <div class="saverow">
+        <button type="button" id="saveBtn" class="save">기록하기</button>
+        <span class="status" id="status"></span>
+      </div>
+    </section>
+
+    <section class="strip">
+      <div class="striphead">
+        <span class="fl">지난 21일</span>
+        <span class="legend"><i class="dot filled"></i>기록함 <i class="dot"></i>비어 있음</span>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="review" id="review"></div>
+    </section>
+
+    <section class="recent">
+      <div class="fl">최근 기록</div>
+      <div id="list" class="list"></div>
+    </section>
+  </div>
+</div>
+
+<style>
+  #root {
+    --ink: #1c2226;
+    --ink-2: #4a545b;
+    --ink-3: #808d95;
+    --line: #dde3e6;
+    --bg: #f7f8f8;
+    --panel: #ffffff;
+    --accent: #3f6b63;
+    --accent-soft: #e4ede9;
+    font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
+                 "Malgun Gothic", "Segoe UI", sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-color-scheme: dark) {
+    #root {
+      --ink: #e8edef; --ink-2: #a9b5bb; --ink-3: #6e7c84;
+      --line: #2c3438; --bg: #14191c; --panel: #1b2225;
+      --accent: #7fb3a6; --accent-soft: #24322f;
+    }
+  }
+
+  #root * { box-sizing: border-box; }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 4px 2px 32px; }
+
+  .head { margin-bottom: 20px; }
+  .eyebrow {
+    font-size: 11px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--ink-3); margin-bottom: 8px;
+  }
+  .head h1 {
+    margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -.02em;
+  }
+  .today { margin-top: 6px; font-size: 13px; color: var(--ink-2); }
+
+  .card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 18px 18px 16px;
+  }
+
+  .field { margin-bottom: 16px; }
+  .field:last-of-type { margin-bottom: 18px; }
+  .fl {
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--ink-2); margin-bottom: 8px; letter-spacing: .01em;
+  }
+  .opt { font-weight: 400; color: var(--ink-3); }
+
+  .timeinput, .textinput {
+    width: 100%; padding: 9px 11px; font-size: 15px;
+    font-family: inherit; color: var(--ink);
+    background: var(--bg); border: 1px solid var(--line);
+    border-radius: 7px; outline: none;
+  }
+  .timeinput { width: auto; min-width: 130px; }
+  .textinput::placeholder { color: var(--ink-3); }
+  .timeinput:focus, .textinput:focus {
+    border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  .segs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .seg {
+    flex: 1 1 auto; min-width: 56px; padding: 9px 10px;
+    font-family: inherit; font-size: 14px; color: var(--ink-2);
+    background: var(--bg); border: 1px solid var(--line);
+    border-radius: 7px; cursor: pointer;
+  }
+  .seg:hover { border-color: var(--ink-3); }
+  .seg:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .seg[aria-pressed="true"] {
+    background: var(--accent); border-color: var(--accent);
+    color: #fff; font-weight: 600;
+  }
+  @media (prefers-color-scheme: dark) {
+    .seg[aria-pressed="true"] { color: #10201c; }
+  }
+
+  .saverow { display: flex; align-items: center; gap: 12px; }
+  .save {
+    padding: 10px 20px; font-family: inherit; font-size: 14px; font-weight: 600;
+    color: #fff; background: var(--ink); border: none;
+    border-radius: 7px; cursor: pointer;
+  }
+  @media (prefers-color-scheme: dark) { .save { color: #14191c; background: var(--ink); } }
+  .save:disabled { opacity: .5; cursor: default; }
+  .save:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .status { font-size: 13px; color: var(--ink-3); }
+
+  .strip { margin-top: 28px; }
+  .striphead {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .striphead .fl { margin-bottom: 0; }
+  .legend { font-size: 11px; color: var(--ink-3); display: flex; align-items: center; gap: 5px; }
+  .legend .dot { margin-left: 6px; }
+  .legend .dot:first-child { margin-left: 0; }
+
+  .dot {
+    display: inline-block; width: 9px; height: 9px; border-radius: 2px;
+    border: 1px solid var(--line); background: transparent;
+  }
+  .dot.filled { background: var(--accent); border-color: var(--accent); }
+
+  .grid {
+    display: grid; grid-template-columns: repeat(21, 1fr); gap: 4px;
+  }
+  .cell {
+    aspect-ratio: 1; border-radius: 3px;
+    border: 1px solid var(--line); background: transparent;
+  }
+  .cell.on { background: var(--accent); border-color: var(--accent); }
+  .cell.today { box-shadow: 0 0 0 2px var(--accent-soft); }
+
+  .review {
+    margin-top: 12px; font-size: 12px; color: var(--ink-2);
+    padding: 10px 12px; background: var(--accent-soft);
+    border-radius: 7px; line-height: 1.5;
+  }
+
+  .recent { margin-top: 28px; }
+  .list { border-top: 1px solid var(--line); }
+  .row {
+    display: flex; gap: 12px; align-items: baseline;
+    padding: 10px 2px; border-bottom: 1px solid var(--line);
+    font-size: 13px;
+  }
+  .row .d { color: var(--ink-3); min-width: 52px; font-variant-numeric: tabular-nums; }
+  .row .v { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .row .n { color: var(--ink-3); margin-left: auto; text-align: right; }
+  .empty { padding: 14px 2px; font-size: 13px; color: var(--ink-3); }
+</style>
+
+<script>
+(function () {
+  var KEY = 'daily-log-v1';
+  var state = { start: null, entries: {} };
+  var sel = { meals: null, out: null };
+
+  function ymd(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') +
+           '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function shortDate(s) {
+    var p = s.split('-');
+    return p[1].replace(/^0/, '') + '/' + p[2];
+  }
+  var today = ymd(new Date());
+
+  var WEEK = ['일', '월', '화', '수', '목', '금', '토'];
+  (function () {
+    var d = new Date();
+    document.getElementById('todayLabel').textContent =
+      (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + WEEK[d.getDay()] + '요일';
+  })();
+
+  function setStatus(msg) { document.getElementById('status').textContent = msg || ''; }
+
+  function bindSegs(id, key) {
+    var box = document.getElementById(id);
+    box.querySelectorAll('.seg').forEach(function (b) {
+      b.setAttribute('aria-pressed', 'false');
+      b.addEventListener('click', function () {
+        var v = b.getAttribute('data-v');
+        sel[key] = (sel[key] === v) ? null : v;
+        box.querySelectorAll('.seg').forEach(function (x) {
+          x.setAttribute('aria-pressed', String(x.getAttribute('data-v') === sel[key]));
+        });
+        setStatus('');
+      });
+    });
+  }
+  bindSegs('meals', 'meals');
+  bindSegs('out', 'out');
+
+  function applySegs(id, key, val) {
+    sel[key] = (val === null || val === undefined) ? null : String(val);
+    document.getElementById(id).querySelectorAll('.seg').forEach(function (x) {
+      x.setAttribute('aria-pressed', String(x.getAttribute('data-v') === sel[key]));
+    });
+  }
+
+  async function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) state = JSON.parse(raw);
+    } catch (e) {
+      state = { start: null, entries: {} };
+    }
+    if (!state.entries) state.entries = {};
+    if (!state.start) {
+      state.start = today;
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    }
+    var e = state.entries[today];
+    if (e) {
+      document.getElementById('wake').value = e.wake || '';
+      document.getElementById('note').value = e.note || '';
+      applySegs('meals', 'meals', e.meals);
+      applySegs('out', 'out', e.out);
+      setStatus('오늘 기록됨');
+    }
+    render();
+  }
+
+  async function save() {
+    var btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    setStatus('저장 중');
+    state.entries[today] = {
+      wake: document.getElementById('wake').value || null,
+      meals: sel.meals,
+      out: sel.out,
+      note: document.getElementById('note').value.trim() || null,
+      at: new Date().toISOString()
+    };
+    try {
+      localStorage.setItem(KEY, JSON.stringify(state));
+      setStatus('저장됨');
+    } catch (e) {
+      setStatus('저장 실패. 다시 눌러 주세요');
+    }
+    btn.disabled = false;
+    render();
+  }
+  document.getElementById('saveBtn').addEventListener('click', save);
+
+  function render() {
+    var grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    var days = [];
+    for (var i = 20; i >= 0; i--) {
+      var d = new Date();
+      d.setDate(d.getDate() - i);
+      days.push(ymd(d));
+    }
+    days.forEach(function (k) {
+      var c = document.createElement('div');
+      c.className = 'cell' + (state.entries[k] ? ' on' : '') + (k === today ? ' today' : '');
+      c.title = k;
+      grid.appendChild(c);
+    });
+
+    var start = new Date(state.start + 'T00:00:00');
+    var end = new Date(start); end.setDate(end.getDate() + 21);
+    var left = Math.ceil((end - new Date(today + 'T00:00:00')) / 86400000);
+    var rv = document.getElementById('review');
+    if (left > 0) {
+      rv.textContent = '점검일까지 ' + left + '일 (' + shortDate(ymd(end)) +
+        '). 그날 기상·식사가 그대로거나 더 나빠져 있으면 병원 예약하기로 정해 둔 날입니다.';
+    } else {
+      rv.textContent = '점검일(' + shortDate(ymd(end)) +
+        ')이 지났습니다. 위 21일 기록을 보고, 나아지지 않았다면 예약하기로 했던 시점입니다.';
+    }
+
+    var list = document.getElementById('list');
+    list.innerHTML = '';
+    var keys = Object.keys(state.entries).sort().reverse().slice(0, 7);
+    if (!keys.length) {
+      list.innerHTML = '<div class="empty">아직 기록이 없습니다.</div>';
+      return;
+    }
+    keys.forEach(function (k) {
+      var e = state.entries[k];
+      var bits = [];
+      if (e.wake) bits.push('기상 ' + e.wake);
+      if (e.meals !== null && e.meals !== undefined) bits.push('식사 ' + e.meals);
+      if (e.out) bits.push(e.out === 'yes' ? '외출 O' : '외출 X');
+      var row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML = '<span class="d">' + shortDate(k) + '</span>' +
+                      '<span class="v"></span><span class="n"></span>';
+      row.querySelector('.v').textContent = bits.join(' · ') || '—';
+      row.querySelector('.n').textContent = e.note || '';
+      list.appendChild(row);
+    });
+  }
+
+  load();
+})();
+</script>
+
+</body>
+</html>
